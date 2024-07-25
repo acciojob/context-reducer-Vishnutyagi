@@ -36,10 +36,10 @@ function App() {
             <button id='clear-list' onClick={reset}>ClearList</button>
         </form>
         <div id='current-user'>
-            <ul>
+            <ul key="relative">
                 {
                     list.map((item,index)=>{
-                        return <li id='item-{item.name}'>Current user:{item.name}, isAuthenticated: {item.isauth} <button id="remove-{item.name}" onClick={()=>{remove(index)}}>Remove</button></li>
+                        return <li key="{item.name}" id='item-{item.name}'>Current user:{item.name}, isAuthenticated: {item.isauth} <button id="remove-{item.name}" onClick={()=>{remove(index)}}>Remove</button></li>
                     })
                 }
             </ul>
