@@ -1,51 +1,79 @@
-import React, { useState } from 'react'
+import React, { useState, useContext, createContext } from 'react';
 
-function App() {   
-    const [list,setList]=useState([]);
-    const [name,setName]=useState("");
-    const changed=(e)=>{
-        setName(e.target.value);
-    }
-    const added=(e)=>{
-        if(name!==""){
-            const res={name:name,isauth:"Yes"}
-            setList([...list,res]);
-            e.preventDefault();
-        }
-    }
-    const signedout=()=>{
-        const res={name:"",isauth:"No"}
-        setList([...list,res]);
-        e.preventDefault();
-    }
-    const reset=(e)=>{
-        setList([]);
-        e.preventDefault();
-    }
-    function remove(i){
-        const newlist=list.filter((_,index)=>index!==i);
-        setList(newlist);
-        e.preventDefault();
-    }
+// Create a context for authentication
+const AuthContext = createContext();
+
+function App() {
+  const [user, setUser] = useState({ name: '', isAuthenticated: false });
+  const [items, setItems] = useState([]);
+
   return (
-    <div id='main'>
-        <form>
-            <input id='shopping-input' type='text' onChange={changed}></input>
-            <button id='login-btn' onClick={added}>Longin</button>
-            <button id='signout' onClick={signedout}>Signout</button>
-            <button id='clear-list' onClick={reset}>ClearList</button>
-        </form>
-        <div id='current-user'>
-            <ul key="relative">
-                {
-                    list.map((item,index)=>{
-                        return <li key="{item.name}" id='item-{item.name}'>Current user:{item.name}, isAuthenticated: {item.isauth} <button id="remove-{item.name}" onClick={()=>{remove(index)}}>Remove</button></li>
-                    })
-                }
-            </ul>
-        </div>
-    </div>
-  )
+    <AuthContext.Provider value={{ user, setUser }}>
+      <div className="App">
+        <LoginLogout />
+        <p id="current-user">
+          Current user: {user.name}, isAuthenticated: {user.isAuthenticated ? 'Yes' : 'No'}
+        </p>
+        <ItemInput items={items} setItems={setItems} />
+        <ItemList items={items} setItems={setItems} />
+      </div>
+    </AuthContext.Provider>
+  );
 }
 
-export default App
+function LoginLogout() {
+  const { user, setUser } = useContext(AuthContext);
+
+  const login = () => setUser({ name: 'rohan', isAuthenticated: true });
+  const logout = () => setUser({ name: '', isAuthenticated: false });
+
+  return (
+    <div>
+      <button id="login-btn" onClick={login}>Login</button>
+      <button id="signout" onClick={logout}>Signout</button>
+    </div>
+  );
+}
+
+function ItemInput({ items, setItems }) {
+  const [input, setInput] = useState('');
+
+  const addItem = () => {
+    if (input) {
+      setItems([...items, input]);
+      setInput('');
+    }
+  };
+
+  return (
+    <div>
+      <input
+        id="shopping-input"
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <button onClick={addItem}>Add</button>
+      <button id="clear-list" onClick={() => setItems([])}>Clear</button>
+    </div>
+  );
+}
+
+function ItemList({ items, setItems }) {
+  const removeItem = (itemToRemove) => {
+    setItems(items.filter(item => item !== itemToRemove));
+  };
+
+  return (
+    <ul>
+      {items.map((item, index) => (
+        <li key={index} id={`item-${item}`}>
+          {item}
+          <button id={`remove-${item}`} onClick={() => removeItem(item)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default App;
