@@ -28,7 +28,7 @@ function App() {
         e.preventDefault();
     }
   return (
-    <div>
+    <div id='main'>
         <form>
             <input id='shopping-input' type='text' onChange={changed}></input>
             <button id='login-btn' onClick={added}>Longin</button>
